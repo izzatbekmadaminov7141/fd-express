@@ -1,0 +1,50 @@
+const express = require("express");
+const Joi = require('joi');
+const app = express();
+app.use(express.json());
+
+const books = [
+    { id: 1, name: "FullStack developer" },
+    { id: 2, name: "Javascript" },
+    { id: 3, name: "Node js" },
+];
+
+app.get("/", (req, res) => {
+    res.send("Salom");
+});
+
+app.get("/api/book", (req, res) => {
+    res.send(books);
+});
+
+app.post("/api/book", (req, res) => {
+    const bookSchema = Joi.object({
+        name: Joi.string().required().min(3)
+    });
+
+    const { error } = bookSchema.validate(req.body);
+    if (error) {
+        return res.status(400).send(error.details[0].message);
+    }
+
+    const book = {
+        id: books.length + 1,
+        name: req.body.name
+    };
+    books.push(book);
+    res.status(201).send(book);
+});
+
+app.get("/api/book/:id", (req, res) => {
+    const book = books.find(b => b.id === parseInt(req.params.id));
+    if (!book) {
+        return res.status(404).send("Berilgan ID orqali kitob topilmadi.");
+    }
+    res.send(book);
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, (err) => {
+    if (err) console.log("Error on port", port);
+    console.log(${port} portni tinglash...);
+});
